@@ -35,16 +35,24 @@ def scrape_jumia_laptops(pages_to_scrape=1):
 
                 name = item.query_selector("h3.name")
                 link = item.query_selector("a.core")
+                old_price_element = item.query_selector("div.old")  # Extract old price if available
 
                 name_text = name.inner_text().strip() if name else "N/A"
                 price_text = price_element.inner_text().strip().replace("MAD", "").replace("Dhs", "").replace(",", "").replace(" ", "")
+
+                old_price_text = (
+                    old_price_element.inner_text().strip().replace("MAD", "").replace("Dhs", "").replace(",", "").replace(" ", "")
+                    if old_price_element else None
+                )
+
                 url = "https://www.jumia.ma" + link.get_attribute("href") if link else "N/A"
 
-                print(f"✅ [{i+1}] {name_text} — {price_text} MAD")
+                print(f"✅ [{i+1}] {name_text} — {price_text} MAD | Old Price: {old_price_text or 'N/A'} MAD")
 
                 products.append({
                     "Product": name_text,
                     "Price": float(price_text) if price_text.replace('.', '').isdigit() else 0.0,
+                    "Old Price": float(old_price_text) if old_price_text and old_price_text.replace('.', '').isdigit() else None,
                     "URL": url,
                     "Platform": "Jumia"
                 })
@@ -53,9 +61,11 @@ def scrape_jumia_laptops(pages_to_scrape=1):
 
         browser.close()
 
+    # Save to CSV
     df = pd.DataFrame(products)
     df.to_csv("jumia_laptops.csv", index=False)
     print("✅ Data saved to 'jumia_laptops.csv'")
 
 if __name__ == "__main__":
-    scrape_jumia_laptops(pages_to_scrape=1)
+    scrape_jumia_laptops(pages_to_scrape=5)
+
