@@ -1,4 +1,11 @@
+# Ignore data and temporary files
+*.xlsx
+*.log
+*.json
+
+# Ignore Python cache
 __pycache__/
-*.png
-*.csv
-.env
+*.pyc
+
+# Ignore Jupyter auto-saves
+.ipynb_checkpoints/
